@@ -19,11 +19,6 @@ length(data$value)
 
 cor <- acf(data$value, lag.max = 4382)
 
-train <- data$value[1:round(length(data$value)*0.4)] #0:40%
-test <- data$value[(round(length(data$value)*0.4) + 1): round(length(data$value)*0.8)] #40:80%
-validation <- data$value[round(length(data$value)*0.8): length(data$value)] #80:100%
-
-
 GetDelta <- function(data)
 {
   result <- c()
@@ -36,7 +31,7 @@ GetDelta <- function(data)
 
 GetAproxSample <- function(trainData, M)
 {
-  return(train[(length(trainData) - M + 1):length(trainData)])
+  return(trainData[(length(trainData) - M + 1):length(trainData)])
 }
 GetTrainSample <- function(trainData, M)
 {
@@ -44,7 +39,7 @@ GetTrainSample <- function(trainData, M)
 }
 
 GetIndexStartMostSimilarSample <- function(trainData, approximationSample, step) {
-
+  
   positionCor <- length(trainData) - length(approximationSample)
   
   maxCorrelation <- 0
@@ -66,13 +61,23 @@ GetIndexStartMostSimilarSample <- function(trainData, approximationSample, step)
   return(indexMaxCorrelation)
 }
 
+dataDelta <- GetDelta(data$value)
+
+trainDelta <- dataDelta[1:round(length(data$value)*0.4)] #0:40%
+testDelta <- dataDelta[(round(length(data$value)*0.4) + 1): round(length(data$value)*0.8)] #40:80%
+validationDelta <- dataDelta[round(length(data$value)*0.8): length(data$value)] #80:100%
 
 
-plot(GetDelta(train[1:100]), type = "l")
+
+plot(trainDelta[1:100], type = "l")
 
 
-trainData <- GetTrainSample(train, M)
-approxSample <- GetAproxSample(train, M)
+#1
+trainData <- GetTrainSample(trainDelta, M)
+approxSample <- GetAproxSample(trainDelta, M)
+length(trainData)
+
+#3
 similarIndex <- GetIndexStartMostSimilarSample(trainData, approxSample, 5)
 
 
