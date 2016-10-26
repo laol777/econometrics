@@ -46,19 +46,33 @@ validationDelta <- dataDelta[(round(length(dataDelta)*b) + 1): length(dataDelta)
 
 
 
-
-
-
-
-
 matchingIndex <- EnumerableDeltaData(trainDelta)
 
+
 positiveDelta <- trainDelta[trainDelta >= 0]
-negativeDelta <- trainDelta[trainDelta < 0]
 
 trainData <- GetTrainSample(positiveDelta, M)
 MSample <- GetAproxSample(positiveDelta, M)
 
+posInd <- GetIndexStartMostSimilarSample(trainData, MSample, step)
+posLmModel <- lm(trainData[posInd: (posInd + M - 1)] ~ MSample)
+kPos <- posLmModel$coefficients[[2]]
+offsetPos <- posLmModel$coefficients[[1]]
+
+result <- c(1:P)
+
+for( i in c(1:P) )
+{
+  tmpIndex <- matchingIndex$index[ matchingIndex$positive == posInd ]
+  predIndex <- matchingIndex$positive[ ( matchingIndex$index > tmpIndex ) 
+                                       & ( matchingIndex$index <= (tmpIndex + i) ) 
+                                       & ( matchingIndex$positive != 0 )  ]
+  
+  predictPositiveDelta <- sum(positiveDelta[predIndex])
+  result[i] <- predictPositiveDelta
+}
+
+GetPredictForSeparateDelta(trainDelta, M, P, step)
 
 #adf.test(trainDelta[1:5], k=1)
 
