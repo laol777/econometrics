@@ -7,7 +7,6 @@ GetDelta <- function(data)
   }
   return(result)
 }
-
 GetAproxSample <- function(trainData, M)
 {
   return(trainData[(length(trainData) - M + 1):length(trainData)])
@@ -16,8 +15,8 @@ GetTrainSample <- function(trainData, M)
 {
   return(trainData[1:(length(trainData) - M)])
 }
-
-GetIndexStartMostSimilarSample <- function(trainData, approximationSample, step) {
+GetIndexStartMostSimilarSample <- function(trainData, approximationSample, step) 
+{
   
   positionCor <- length(trainData) - length(approximationSample)
   
@@ -39,61 +38,45 @@ GetIndexStartMostSimilarSample <- function(trainData, approximationSample, step)
   
   return(indexMaxCorrelation)
 }
-
 GetCountPositive <- function(data)
 {
   return(sum(data >= 0))
 }
 
 
-GetNewHistoryData <- function(trainData, index, countPositive, countNegative)
+EnumerableDeltaData <- function(dataDelta)
 {
-  indexPos <- 0
-  indexNeg <-  0
-  newData <-  c()
-  i <-  1
-  j <- 0
-  while((indexPos < countPositive) | (indexNeg < countNegative))
+  pos <- c(1 : length(dataDelta))
+  neg <- c(1 : length(dataDelta))
+  posIndex <- 1
+  negIndex <- 1
+  for(i in 1:length(dataDelta))
   {
-    if((trainData[index] >= 0) & (indexPos < countPositive)) 
+    if(dataDelta[i] >= 0)
     {
-      newData[i] <-  trainData[index]
-      indexPos <- indexPos + 1
-      i <-  i + 1
+      pos[i] <- posIndex
+      neg[i] <- 0
+      posIndex <- posIndex +1
     }
-    if((trainData[index] < 0) & (indexNeg < countNegative)) 
+    else
     {
-      newData[i] <-  trainData[index]
-      indexNeg <- indexNeg + 1
-      i <-  i + 1
+      pos[i] <- 0
+      neg[i] <- negIndex
+      negIndex <- negIndex + 1
     }
-    index <- index + 1
   }
-  return(newData)
+  return(data.frame(index = c(1 : length(dataDelta)), positive = pos, negative = neg))
 }
 
-GetStartPredictPoint <- function(trainData, index, countPositive, countNegative)
+GetPredictForSeparateDelta <- function(trainDelta, M, P)
 {
-  indexPos <- 0
-  indexNeg <-  0
-  newData <-  c()
-  i <-  1
-  j <- 0
-  while((indexPos < countPositive) | (indexNeg < countNegative))
-  {
-    if((trainData[index] >= 0) & (indexPos < countPositive)) 
-    {
-      newData[i] <-  trainData[index]
-      indexPos <- indexPos + 1
-      i <-  i + 1
-    }
-    if((trainData[index] < 0) & (indexNeg < countNegative)) 
-    {
-      newData[i] <-  trainData[index]
-      indexNeg <- indexNeg + 1
-      i <-  i + 1
-    }
-    index <- index + 1
-  }
-  return(index + 1)
+  matchingIndex <- EnumerableDeltaData(trainDelta)
+  
+  positiveDelta <- trainDelta[trainDelta >= 0]
+  negativeDelta <- trainDelta[trainDelta < 0]
+  
+  trainData <- GetTrainSample(positiveDelta, M)
+  MSample <- GetAproxSample(positiveDelta, M)
 }
+
+

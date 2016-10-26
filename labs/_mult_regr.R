@@ -64,8 +64,15 @@ sd_x2 <- sd(result$y - result$x2)
 
 
 #summary(linearModel_x1_x2)
-#summary(linearModel_x1)
+summary(linearModel_x1)
 #summary(linearModel_x2)
+
+png(filename= "2.png")
+
+ggplot(data = X, aes(x = X$x1, y = X$y)) +
+  geom_line(aes(x = X$x1, y = X$y, color='Èñõîäíîå' ), size=1) +
+  geom_line(aes(x = X$x1, y = predict(linearModel_x1), color='Àïïğîê ôóíêöèÿ'), size=1.5) 
+dev.off()
 
 
 # âûâîä - îáà ïğèçíàêà äîñòàòî÷íî çíà÷èìû, äëÿ ïîñòğîåíèÿ ìîäåëè, â ÷åì ìîæíî óáåäèòüñÿ,

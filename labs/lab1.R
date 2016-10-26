@@ -25,6 +25,7 @@ plotNewData <- function(x, predictedY) {
     ggplot(data = X, aes(x = X$minSalary, y = X$meanSalary)) + 
     geom_point(aes(x = X$minSalary, y = X$meanSalary)) + 
     geom_line(aes(x = x, y = predictedY ))
+
 }
 
 getStd <- function(predicted, y){
@@ -46,7 +47,9 @@ linearCoef <- coef(linearModel)
 
 x <- nd$minSalary
 y <- linearCoef[1] + linearCoef[2] * x
-plotNewData(x, y)
+
+png(filename= "res1.png"); plotNewData(x, y); dev.off()
+
 linearStd = getStd(y, X$meanSalary)
 
 #_________________polynomial_____________________________
@@ -61,7 +64,7 @@ polynomialCoef <- coef(polynomialModel)
 x <- nd$minSalary
 #y = b0 * x ^ b1
 y <- exp(polynomialCoef[1]) * (x ^ polynomialCoef[2])
-plotNewData(x, y)
+png(filename= "res2.png"); plotNewData(x, y); dev.off()
 
 polynomialStd = getStd(y, X$meanSalary)
 
@@ -77,7 +80,7 @@ exponentialCoef <- coef(exponentialModel)
 x <- nd$minSalary
 #y = b0 + e ^ (x * 0.005)
 y <- exponentialCoef[1] +  exponentialCoef[2] * exp(x * 0.005)
-plotNewData(x, y)
+png(filename= "res3.png"); plotNewData(x, y); dev.off()
 exponentialStd = getStd(y, X$meanSalary)
 
 #_________________inverse_____________________________________
@@ -87,13 +90,13 @@ linearizedDataY <- X$meanSalary
 
 inverseModel <- lm(linearizedDataY~linearizedDataX)
 inverseCoef <- coef(inverseModel)
-#summary(inverseModel)
+summary(inverseModel)
 
 
 x <- nd$minSalary
 #y = b0 + b1 * (1000 / x)
 y <- inverseCoef[1] + inverseCoef[2] * (1000 / x)
-plotNewData(x, y)
+png(filename= "res4.png"); plotNewData(x, y); dev.off()
 inverseStd = getStd(y, X$meanSalary)
 
 #_________________hyperbolic____________________________
@@ -108,7 +111,7 @@ hyperbolicCoef <- coef(hyperbolicModel)
 x <- nd$minSalary
 #y = 1 / (b0 + b1 * x)
 y <- 1 / (hyperbolicCoef[1] + hyperbolicCoef[2] *  x) 
-plotNewData(x, y)
+png(filename= "res5.png"); plotNewData(x, y); dev.off()
 
 hyperbolicStd = getStd(y, X$meanSalary)
 
@@ -124,4 +127,7 @@ result = data.frame(modelName = c("linear", "polynomial", "exponential", "invers
                 summary(inverseModel)$fstatistic[1], summary(hyperbolicModel)$fstatistic[1])
           )
                      
+
+sd = sd(X$meanSalary)
+mean = mean(X$meanSalary)
 

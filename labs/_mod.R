@@ -46,6 +46,48 @@ X2 <- data.frame(x1 = X$value[1:30], x2 = X$value[31:60])
 var.test(X2$x1, X2$x2)
 # p == 0.458 -> не можем отвергнуть гипотезу об отстутстрии наличия тенденции
 
+FosterStuart <- function(data)
+{
+  u = c()
+  l = c()
+  for(i in c(2:length(data)))
+  {
+    u[i] = 1
+    l[i] = 1
+    for(j in c(1:(i - 1)))
+    {
+      if(data[j] > data[i])
+      {
+        u[i] = 0
+      }
+      if(data[j] < data[i])
+      {
+        l[i] = 0
+      }
+    }
+  }
+  
+  u <- u[2:length(u)]
+  l <- l[2:length(l)]
+  
+  d <- u - l
+  S <- u + l
+  
+  lf <- sqrt(2 * log(length(data)) - 3.4253)
+  ff <- sqrt(2 * log(length(data)) - 0.8456)
+  
+  trendD <- d / ff
+  trendMean <- (S - ff^2) / lf
+  print(t.test(trendD)$p.value)
+  print(t.test(trendMean)$p.value)
+  
+}
+
+FosterStuart(X$value)
+# 0.0001789607
+# 4.694018e-71
+# Проверяли схожесть выборок с распределением стьдента, что дало бы нам право уверждать об отсутвии тренда
+# этого не произошло p-value ~ 0, что определяет наличие тренда
 
 #сглаживание временного ряда
 plot(X$value, type = "l")
@@ -103,6 +145,7 @@ R2 <- RSS / TSS
 sctest(X$value ~ X$index, type = "Chow", point = 3)
 
 
+
 XNextVar = data.frame(
   index = c(1:61),
   value = c(662518,691382,692374,668756,703739,704328,690950,690747,724970,722096,715979,719874,
@@ -114,3 +157,9 @@ XNextVar = data.frame(
 )
 plot(XNextVar$value, type = "l")
 sctest(XNextVar$value ~ XNextVar$index, type = "Chow", point = 3)
+
+
+linearModel$coefficients[1]
+
+
+linearModel$coefficients[2]
