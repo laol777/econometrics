@@ -1,3 +1,4 @@
+
 GetDelta <- function(data)
 {
   result <- c()
@@ -67,40 +68,51 @@ EnumerableDeltaData <- function(dataDelta)
   return(data.frame(index = c(1 : length(dataDelta)), positive = pos, negative = neg))
 }
 
-PredictPosOrNegSample <- function(matchingIndex, deltaSample, M, P, step)
+PredictPosOrNegSample <- function(matchingIndex, deltaSample, M, P, step, isPos)
 {
   trainData <- GetTrainSample(deltaSample, M)
   MSample <- GetAproxSample(deltaSample, M)
   
-  posInd <- GetIndexStartMostSimilarSample(trainData, MSample, step)
-  posLmModel <- lm(trainData[posInd: (posInd + M - 1)] ~ MSample)
-  kPos <- posLmModel$coefficients[[2]]
-  offsetPos <- posLmModel$coefficients[[1]]
+  ind <- GetIndexStartMostSimilarSample(trainData, MSample, step)
+  lmModel <- lm(MSample ~  trainData[ind: (ind + M - 1)])
+  k <- lmModel$coefficients[[2]]
+  offset <- lmModel$coefficients[[1]]
   
   result <- c(1:P)
   
   for( i in c(1:P) )
   {
-    tmpIndex <- matchingIndex$index[ matchingIndex$positive == posInd ]
-    predIndex <- matchingIndex$positive[ ( matchingIndex$index > tmpIndex ) 
-                                         & ( matchingIndex$index <= (tmpIndex + i) ) 
-                                         & ( matchingIndex$positive != 0 )  ]
-    
-    predictDelta <- sum(deltaSample[predIndex])
+    if(isPos)
+    {
+      tmpIndex <- matchingIndex$index[ matchingIndex$positive == ind ]
+      predIndex <- matchingIndex$positive[ ( matchingIndex$index > tmpIndex ) 
+                                           & ( matchingIndex$index <= (tmpIndex + i) ) 
+                                           & ( matchingIndex$positive != 0 )  ]
+    }
+    else
+    {
+      tmpIndex <- matchingIndex$index[ matchingIndex$negative == ind ]
+      predIndex <- matchingIndex$negative[ ( matchingIndex$index > tmpIndex ) 
+                                           & ( matchingIndex$index <= (tmpIndex + i) ) 
+                                           & ( matchingIndex$negative != 0 )  ]
+    }
+    predictDelta <- sum(deltaSample[predIndex] * k + offset)
     result[i] <- predictDelta
   }
+  #print(offset)
   return(result)
 }
 
 GetPredictForSeparateDelta <- function(trainDelta, M, P, step)
 {
   matchingIndex <- EnumerableDeltaData(trainDelta)
+
   
-  
-  positiveDelta <- trainDelta[trainDelta >= 0]
+  positiveDelta <- trainDelta[trainDelta > 0]
   negativeDelta <- trainDelta[trainDelta < 0]
-  print(PredictPosOrNegSample(matchingIndex, positiveDelta, M, P, step))
-  print(PredictPosOrNegSample(matchingIndex, negativeDelta, M, P, step))
+  resultPos <- PredictPosOrNegSample(matchingIndex, positiveDelta, M, P, step, TRUE)
+  resultNeg <- PredictPosOrNegSample(matchingIndex, negativeDelta, M, P, step, FALSE)
+  print(resultPos)
+  print(resultNeg)
+  print(resultPos + resultNeg)
 }
-
-

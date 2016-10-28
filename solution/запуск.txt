@@ -1,0 +1,11 @@
+1) Для запуска требуется установленный язык R и IDE к нему RStudio, ссылки:
+https://cran.r-project.org/
+https://www.rstudio.com/products/rstudio/download3/
+2) Далее в "firstMethod.R" в переменную abolutePath прописать абсолютный путь, до папки, которая была скачана - "solution"
+3) Установка зависимостей
+Tools->Install Packages.
+В поле Packages(seperate multiple ...) ввести
+	dplyr; ggplot2; GGally; psych; gdata; Metrics; tseries
+4) Настройка параметров модели - в блок BaseSetting
+5) Если есть желание, возможно загружать произвольные данные - заменить файл data.csv на свой, в котором структура будет идентична, то есть в первой строчке идет название колонки - "value", далее каждое новое значение с новой строчки.
+6) Выполнение программы - кнопка "Source" при активном и отрытом скрипте "firstMethod.R" 
